@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+let rock = "mountain.2.fill"
+let paper = "doc.fill"
+let scissors = "scissors"
+var playCount = 0
+
 struct ShapeButton: View {
     var shape: String
     
@@ -14,8 +19,8 @@ struct ShapeButton: View {
         Image(systemName: shape)
             .shadow(radius: 5)
             .font(.system(size: 80))
-            .foregroundColor(.primary)
-            .background(.secondary)
+            .foregroundColor(.white)
+            .background(.black)
             .clipShape(.circle)
             .padding()
     }
@@ -27,10 +32,9 @@ struct ContentView: View {
     @State var score = 0
     @State var shouldWin = Bool.random()
     @State var userWins = false
+    @State var showingAlert = false
     
-    let rock = "mountain.2.fill"
-    let paper = "doc.fill"
-    let scissors = "scissors"
+
     
     var body: some View {
         NavigationStack {
@@ -38,7 +42,7 @@ struct ContentView: View {
                 Text(Image(systemName: shapes[0]))
                     .font(.system(size: 100))
                 
-                Text("\(shouldWin ? "Win" : "Loose")")
+                Text("\(shouldWin ? "Win" : "Lose")")
                     .font(.system(size: 60))
                     .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
 
@@ -66,11 +70,18 @@ struct ContentView: View {
             }
             .padding()
         }
-        .navigationTitle("Rock, Paper, Scissors")
-        .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+        .alert("Done!", isPresented: $showingAlert) {
+            Button("OK") {
+                reset()
+            }
+        } message: {
+            Text("Your final score is ^[\(score) point](inflect: true).")
+        }
     }
     
     func play(with userSelection: String) {
+        playCount += 1
+        
         if shouldWin && shapes[0] == rock {
             if userSelection == scissors {
                 // rocks beats scissors
@@ -121,13 +132,27 @@ struct ContentView: View {
                 userWins = true
             }
         }
-
-        print()
-        print()
-        print("App told you to \(shouldWin ? "win" : "loose"), and you \(userWins ? "win" : "loose").")
-        print("app shows \(shapes[0]) and you selected \(userSelection)")
-        print(score)
-        shouldWin = Bool.random()
+        
+        if playCount == 10 {
+            showingAlert = true
+        }
+        
+        // for debugging
+//        print()
+//        print()
+//        print("Game round \(playCount)")
+//        print("App told you to \(shouldWin ? "win" : "loose"), and you \(userWins ? "win" : "loose").")
+//        print("app shows \(shapes[0]) and you selected \(userSelection)")
+//        print(score)
+        shouldWin = !shouldWin
+        shapes.shuffle()
+    }
+    
+    func reset() {
+        playCount = 0
+        score = 0
+        showingAlert = false
+        shouldWin = !shouldWin
         shapes.shuffle()
     }
 }
