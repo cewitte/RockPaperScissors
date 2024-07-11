@@ -19,7 +19,7 @@ struct ShapeButton: View {
     var body: some View {
         Image(systemName: shape)
             .shadow(radius: 5)
-            .font(.largeTitle.weight(.bold))
+            .font(.system(size: 60))
             .foregroundColor(color)
             .background(.background)
             .padding()
@@ -42,7 +42,7 @@ struct ContentView: View {
                     .foregroundColor(shouldWin ? .blue : .red)
 
                 Spacer()
-                HStack{
+                VStack(spacing: 30){
                     Button {
                         play(with: rock)
                     } label: {
@@ -66,7 +66,7 @@ struct ContentView: View {
                     
                 Text("^[\(score) point](inflect: true)")
                     .font(.largeTitle.weight(.bold))
-                    .foregroundColor(score > 0 ? .blue : .red)
+                    .foregroundColor(score < 0 ? .red : .blue)
             }
             .padding()
         }
