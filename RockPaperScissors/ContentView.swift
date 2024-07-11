@@ -14,14 +14,14 @@ var playCount = 0
 
 struct ShapeButton: View {
     var shape: String
+    var color: Color
     
     var body: some View {
         Image(systemName: shape)
             .shadow(radius: 5)
-            .font(.system(size: 80))
-            .foregroundColor(.white)
-            .background(.black)
-            .clipShape(.circle)
+            .font(.largeTitle.weight(.bold))
+            .foregroundColor(color)
+            .background(.background)
             .padding()
     }
 }
@@ -34,48 +34,48 @@ struct ContentView: View {
     @State var userWins = false
     @State var showingAlert = false
     
-
-    
     var body: some View {
         NavigationStack {
             VStack(spacing: 30) {
-                Text(Image(systemName: shapes[0]))
-                    .font(.system(size: 100))
-                
-                Text("\(shouldWin ? "Win" : "Lose")")
-                    .font(.system(size: 60))
-                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                Label("\(shouldWin ? "Play to WIN" : "Play to LOSE")", systemImage: shapes[0])
+                    .font(.largeTitle.weight(.bold))
+                    .foregroundColor(shouldWin ? .blue : .red)
 
+                Spacer()
+                HStack{
                     Button {
                         play(with: rock)
                     } label: {
-                        ShapeButton(shape: rock)
+                        ShapeButton(shape: rock, color: .black)
                     }
                     
                     Button {
                         play(with: paper)
                     } label: {
-                        ShapeButton(shape: paper)
+                        ShapeButton(shape: paper, color: .white)
                     }
                     
                     Button {
                         play(with: scissors)
                     } label: {
-                        ShapeButton(shape: scissors)
+                        ShapeButton(shape: scissors, color: .gray)
                     }
+                }
+                
+                Spacer()
                     
-
                 Text("^[\(score) point](inflect: true)")
                     .font(.largeTitle.weight(.bold))
+                    .foregroundColor(score > 0 ? .blue : .red)
             }
             .padding()
         }
-        .alert("Done!", isPresented: $showingAlert) {
+        .alert("Game over!", isPresented: $showingAlert) {
             Button("OK") {
                 reset()
             }
         } message: {
-            Text("Your final score is ^[\(score) point](inflect: true).")
+            Text("Your final score is ^[\(score) point](inflect: true) after ^[\(playCount) attempt](inflect: true).")
         }
     }
     
@@ -84,27 +84,22 @@ struct ContentView: View {
         
         if shouldWin && shapes[0] == rock {
             if userSelection == scissors {
-                // rocks beats scissors
                 score -= 1
                 userWins = false
             } else if userSelection == paper {
-                // paper beats rock
                 score += 1
                 userWins = true
             }
         } else if shouldWin && shapes[0] == paper {
             if userSelection == rock {
-                // paper beats rock
                 score -= 1
                 userWins = false
             } else if userSelection == scissors {
-                // scissor beats paper
                 score += 1
                 userWins = true
             }
         } else if shouldWin && shapes[0] == scissors {
             if userSelection == rock {
-                // rocks beats scissors
                 score += 1
                 userWins = true
             } else if userSelection == paper {
@@ -113,21 +108,25 @@ struct ContentView: View {
             }
         } else if !shouldWin && shapes[0] == rock {
             if userSelection == paper {
-                // paper beats rock, but user is supposed to loose
                 score -= 1
                 userWins = false
             } else if userSelection == scissors {
-                // rock beats scissors, and user is supposed to loose
                 score += 1
                 userWins = true
             }
         } else if !shouldWin && shapes[0] == paper {
             if userSelection == scissors {
-                // scissors beat paper, but user is supposed to loose
                 score -= 1
                 userWins = false
             } else if userSelection == rock {
-                // paper beats rock, but user is supposed to loose
+                score += 1
+                userWins = true
+            }
+        } else if !shouldWin && shapes[0] == scissors {
+            if userSelection == rock {
+                score -= 1
+                userWins = false
+            } else if userSelection == paper {
                 score += 1
                 userWins = true
             }
@@ -137,13 +136,6 @@ struct ContentView: View {
             showingAlert = true
         }
         
-        // for debugging
-//        print()
-//        print()
-//        print("Game round \(playCount)")
-//        print("App told you to \(shouldWin ? "win" : "loose"), and you \(userWins ? "win" : "loose").")
-//        print("app shows \(shapes[0]) and you selected \(userSelection)")
-//        print(score)
         shouldWin = !shouldWin
         shapes.shuffle()
     }
